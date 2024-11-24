@@ -1,6 +1,7 @@
 import pygame as pg
 import random
 import sys
+import time
 
 def getWH():
     import tkinter as tk
@@ -34,7 +35,7 @@ class Main:
         self.dire=False
         self.walking=0
         self.nwc=self.fpa # stands for next_walk_countdown
-        self.healthes=[100,100]
+        self.healthes=[500,500]
         self.playerposes=[]
         self.front_page()
 
@@ -194,14 +195,7 @@ class Main:
             returns.append(font)
         return returns
 
-    def play_font(self,dialogs=None):
-        rect1=self.pause.get_rect()
-        rect1.x=rect1.h
-        rect1.y=rect1.h/2
-        if rect1.collidepoint(pg.mouse.get_pos()):
-            self.scr.blit(self.pause,rect1)
-        else:
-            self.scr.blit(self.pause_touched,rect1)
+    def play_font(self,dialogs=None,pause=True):
         if dialogs:# [[font,countdown]...]
             index=0
             for i in dialogs:
@@ -216,7 +210,15 @@ class Main:
                     self.scr.blit(j,rect0)
                     index+=1
                 index+=1
-        return rect1
+        if pause:
+            rect1=self.pause.get_rect()
+            rect1.x=rect1.h
+            rect1.y=rect1.h/2
+            if rect1.collidepoint(pg.mouse.get_pos()):
+                self.scr.blit(self.pause,rect1)
+            else:
+                self.scr.blit(self.pause_touched,rect1)
+            return rect1
 
     def player_move(self,xchange=0,enemyrect=None):
         shot=None
@@ -265,7 +267,7 @@ class Main:
         rect.bottom=self.height-self.height/6-self.y
         self.scr.blit(pg.transform.flip(img,self.dire,False),rect)
         self.scr.fill((0,0,200),(rect.x,rect.y-rect.h/20,
-                                     rect.w/100*self.healthes[0],rect.h/20))
+                                     rect.w/500*self.healthes[0],rect.h/20))
         self.playerposes.append(rect)
         if len(self.playerposes)>20:
             del self.playerposes[0]
@@ -296,7 +298,7 @@ class Main:
         if keys[pg.K_d] or keys[pg.K_RIGHT]:
             x_change+=self.walk_speed
             self.dire=False
-        if keys[pg.K_SPACE] or keys[pg.K_UP]:
+        if keys[pg.K_SPACE] or keys[pg.K_UP] or keys[pg.K_w]:
             if self.y==0:
                 self.yforce=20
             if self.status=="attack" or self.status=="w2a":
@@ -431,7 +433,7 @@ class Main:
 
             self.scr.blit(bossimg,bossrect)
             self.scr.fill((0,0,200),(bossrect.x,bossrect.y-bossrect.h/20,
-                                     bossrect.w/100*self.healthes[-1],bossrect.h/20))
+                                     bossrect.w/500*self.healthes[-1],bossrect.h/20))
             if self.nwc==self.fpa:
                 x=bossrect.centerx-bossrect.w/5
                 y=bossrect.centery-bossrect.h/5
@@ -466,11 +468,41 @@ class Main:
             pg.display.set_caption(str(self.clock.get_fps()))
 
     def defeat(self,playerimg, playerrect,bosscor,bg0,bg1):
-        bossdios=[[["my wife was mudered, i wanna revenge", "i wanna kill that man, he murdered my wife"], 300],
-        [["but killing is wrong, so my kindness went against it"],200], 
-        [["so you were created my son, you are here to replace me","you will have a new life, without hate"],300],
-        [["do you wanna revenge for your wife, my copy?"], 150],
-        [["right key for yes, left key for no"],10000000000000000000000000000000000000000000000000000000000]]
+        bossdios=[[["my wife was mudered, i wanna revenge", "i wanna kill that man, he murdered my wife"], 200],
+        [["but killing is wrong, so my kindness went against it"],100], 
+        [["so you were createds, you are here to replace me","you are a new personality, you will have new memorys","you will have a new life, without hate"],300],
+        [["do you wanna revenge for your wife, my copy? are you willing to be a killer?"], 100]]
+        boss_fonts=[]
+        for i,time in bossdios:
+            boss_fonts.append([self.makedio(i),time])
+        dialogsindex=0
+        dialogs=[boss_fonts[dialogsindex]]
+        bossimg=self.assets["img"]["bossfall"]
+        bossrect:pg.Rect=bossimg.get_rect()
+        bossrect.x=bosscor[0]
+        bossrect.y=bosscor[1]
+        while True:
+            self.scr.fill((40+self.deep*10,40,0))
+            self.displaybg(bg0,bg1,0)
+
+            self.scr.blit(bossimg,bossrect)
+            self.scr.blit(playerimg,playerrect)
+
+            if dialogs[-1][1]==0:
+                dialogsindex+=1
+                if dialogsindex>=4:
+                    break
+                dialogs.append(boss_fonts[dialogsindex])
+
+            self.play_font(dialogs,False)
+            for e in pg.event.get():
+                if e.type==pg.QUIT:
+                    sys.exit(self)
+            pg.display.flip()
+            self.clock.tick(60)
+            pg.display.set_caption(str(self.clock.get_fps()))
+        
+        bossdios=[[["right key for yes, left key for no"],10000000000000000000000000000000000000000000000000000000000]]
         boss_fonts=[]
         for i,time in bossdios:
             boss_fonts.append([self.makedio(i),time])
@@ -491,16 +523,16 @@ class Main:
                 dialogsindex+=1
                 dialogs.append(boss_fonts[dialogsindex])
             
-            self.play_font(dialogs)
+            self.play_font(dialogs,False)
             for e in pg.event.get():
                 if e.type==pg.QUIT:
                     sys.exit(self)
             keys=pg.key.get_pressed()
             if keys[pg.K_a] or keys[pg.K_LEFT]:
-                self.endkill()
+                self.endmental()
                 return
             elif keys[pg.K_d] or keys[pg.K_RIGHT]:
-                self.endmental()
+                self.endkill()
                 return
             pg.display.flip()
             self.clock.tick(60)
@@ -516,7 +548,7 @@ class Main:
         img=pg.transform.scale(img,self.screct)
         while True:
             self.scr.blit(img,(0,0))
-            self.play_font([[intro_font,10]])
+            self.play_font([[intro_font,10]],False)
             for e in pg.event.get():
                 if e.type==pg.QUIT:
                     sys.exit(self)
@@ -531,7 +563,7 @@ class Main:
         img=pg.transform.scale(img,self.screct)
         while True:
             self.scr.blit(img,(0,0))
-            self.play_font([[intro_font,10]])
+            self.play_font([[intro_font,10]],False)
             for e in pg.event.get():
                 if e.type==pg.QUIT:
                     sys.exit(self)
@@ -542,9 +574,9 @@ class Main:
 
     def win(self,playerimg, playerrect,bosscor,bg0,bg1):
         run=1
-        bossdios=[(("no.. you even don't understand","if you do, you will do the same thing as me"),300),
-                 (("he says he is trying to project you","but he is just trying to follow his old rules!"),300),
-                 (("why! why!",),150)]
+        bossdios=[(("no.. you even don't understand","if you do, you will do the same thing as me"),200),
+                 (("he says he is trying to project you","but he is just trying to follow his old rules!"),200),
+                 (("why! why!",),100)]
         boss_fonts=[]
         for i,time in bossdios:
             boss_fonts.append([self.makedio(i),time])
@@ -567,7 +599,7 @@ class Main:
                     break
                 dialogs.append(boss_fonts[dialogsindex])
 
-            self.play_font(dialogs)
+            self.play_font(dialogs,False)
             for e in pg.event.get():
                 if e.type==pg.QUIT:
                     sys.exit(self)
@@ -584,7 +616,7 @@ class Main:
         img=pg.transform.scale(img,self.screct)
         while True:
             self.scr.blit(img,(0,0))
-            self.play_font([[intro_font,10]])
+            self.play_font([[intro_font,10]],False)
             for e in pg.event.get():
                 if e.type==pg.QUIT:
                     sys.exit(self)

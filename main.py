@@ -392,7 +392,7 @@ class Main:
             if not stage:
                 bossrect.y-=decendspeed
                 self.scr.blit(bossimg,bossrect)
-                if bossrect.bottom==self.height-self.height/6:
+                if bossrect.bottom<=self.height-self.height/6:
                     stage=1
             else:
                 attack+=1
@@ -596,7 +596,3 @@ class Main:
             pg.display.flip()
 
 Main()
-
-#[[["sentence","sentence"],second takes to say it],...]
-# diologs: evil explaining the backstory [["who are you"], 2] [["I am you but better"], 3] inner voice [["this is who you have become"], 5]
-# [["how is that possible"], 3] [["When your wife died, it broke you", "you sought out for revenge again the person who killed her"], 10] [["but they were too powerful", "so now you've decided to kill him, are you a killer"], 8]

@@ -1,6 +1,3 @@
-# music list: 
-# image list: main character(stand*, walk, attack)
-
 import pygame as pg
 import random
 import sys
@@ -500,10 +497,10 @@ class Main:
                     sys.exit(self)
             keys=pg.key.get_pressed()
             if keys[pg.K_a] or keys[pg.K_LEFT]:
-                self.endmental()
+                self.endkill()
                 return
             elif keys[pg.K_d] or keys[pg.K_RIGHT]:
-                self.endkill()
+                self.endmental()
                 return
             pg.display.flip()
             self.clock.tick(60)

@@ -35,7 +35,7 @@ class Main:
         self.dire=False
         self.walking=0
         self.nwc=self.fpa # stands for next_walk_countdown
-        self.healthes=[500,500]
+        self.healthes=[700,500]
         self.playerposes=[]
         self.front_page()
 
@@ -502,7 +502,7 @@ class Main:
             self.clock.tick(60)
             pg.display.set_caption(str(self.clock.get_fps()))
         
-        bossdios=[[["right key for yes, left key for no"],10000000000000000000000000000000000000000000000000000000000]]
+        bossdios=[[["left key for no, right key for yes"],10000000000000000000000000000000000000000000000000000000000]]
         boss_fonts=[]
         for i,time in bossdios:
             boss_fonts.append([self.makedio(i),time])
@@ -610,7 +610,8 @@ class Main:
         introdio=["you woked up and found yourself just having a dream",
                   "you know you needs to move to another country to live",
                   "you rememeber that someone you loved seems to be dead?",
-                  "na, should be no one important"]
+                  "na, should be no one important",
+                  "(confused what's happening? play again to learn more about the story)"]
         intro_font=self.makedio(introdio,True)
         img=self.assets["img"]["plane"]
         img=pg.transform.scale(img,self.screct)
@@ -623,5 +624,4 @@ class Main:
                 elif e.type==pg.MOUSEBUTTONDOWN:
                     return
             pg.display.flip()
-
 Main()
